@@ -40,6 +40,11 @@ export type ArrivalResult = {
   };
 };
 
+function buildApiUrl(path: string): URL {
+  const baseUrl = API_BASE_URL.replace(/\/$/, '');
+  return new URL(`${baseUrl}${path}`, window.location.origin);
+}
+
 function getDepartureDate(result: ArrivalResult): Date | null {
   const departure = result.arribo.salida?.estimada ?? result.arribo.salida?.programada;
   if (!departure) {
@@ -67,8 +72,9 @@ export async function searchStations(query: string): Promise<Station[]> {
     return [];
   }
 
-  const url = `${API_BASE_URL}/infraestructura/estaciones?nombre=${encodeURIComponent(query.trim())}`;
-  const response = await fetch(url);
+  const url = buildApiUrl('/infraestructura/estaciones');
+  url.searchParams.set('nombre', query.trim());
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw new Error('No se pudieron buscar estaciones');
@@ -92,7 +98,7 @@ export async function fetchArrivals(params: {
   hora: string;
 }): Promise<ArrivalResult[]> {
   const buildUrl = (includeTime: boolean) => {
-    const url = new URL(`${API_BASE_URL}/arribos/estacion/${params.origenId}`);
+    const url = buildApiUrl(`/arribos/estacion/${params.origenId}`);
     if (params.destinoId) {
       url.searchParams.set('hasta', params.destinoId);
     }
