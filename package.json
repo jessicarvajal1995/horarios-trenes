@@ -5,7 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev:front": "npm --prefix front run dev",
+    "build:front": "npm --prefix front ci && npm --prefix front run build",
+    "build": "npm run build:front"
   },
   "author": "ariedro",
   "license": "WTFPL",
